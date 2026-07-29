@@ -1,0 +1,128 @@
+import { registerSW } from 'virtual:pwa-register'
+import './style.css'
+import programsData from './programs.json'
+import { loadLog, recordSession, saveLog, todayISO } from './storage'
+import type { Program, ProgramsFile, SessionEntry } from './types'
+import { collapseToSingle, expandToSets, isWeighted, resolveWeights } from './weights'
+import { type Draft, renderPicker, renderWorkout } from './view'
+
+const { weightStep, programs } = programsData as ProgramsFile
+const app = document.querySelector<HTMLDivElement>('#app')!
+
+let log = loadLog()
+let activeProgram: Program | null = null
+let draft: Draft = new Map()
+
+function render(): void {
+  app.innerHTML = activeProgram
+    ? renderWorkout(activeProgram, draft)
+    : renderPicker(programs, log)
+}
+
+function openProgram(programId: string): void {
+  const program = programs.find((candidate) => candidate.id === programId)
+  if (!program) return
+  activeProgram = program
+  draft = new Map(
+    program.exercises.map((exercise) => [exercise.id, resolveWeights(log, program.id, exercise)]),
+  )
+  render()
+}
+
+function entriesFromDraft(program: Program): SessionEntry[] {
+  return program.exercises
+    .filter(isWeighted)
+    .map((exercise) => ({ exerciseId: exercise.id, weights: draft.get(exercise.id) ?? [] }))
+    .filter((entry) => entry.weights.length > 0)
+}
+
+/** Persists the whole workout, so the log always holds a complete snapshot. */
+function persist(): void {
+  if (!activeProgram) return
+  recordSession(log, activeProgram.id, todayISO(), entriesFromDraft(activeProgram))
+  saveLog(log)
+}
+
+function weightAt(weights: number[] | null, setIndex: number): number {
+  if (!weights || weights.length === 0) return 0
+  return weights[Math.min(setIndex, weights.length - 1)]!
+}
+
+function updateWeight(exerciseId: string, setIndex: number, value: number): number[] {
+  const current = draft.get(exerciseId)
+  const weights = current && current.length > 0 ? [...current] : [0]
+  weights[Math.min(setIndex, weights.length - 1)] = value
+  draft.set(exerciseId, weights)
+  return weights
+}
+
+function step(exerciseId: string, setIndex: number, direction: 1 | -1): void {
+  const current = weightAt(draft.get(exerciseId) ?? null, setIndex)
+  const next = Math.max(0, Math.round((current + direction * weightStep) * 100) / 100)
+  updateWeight(exerciseId, setIndex, next)
+  const input = app.querySelector<HTMLInputElement>(
+    `input[data-ex="${exerciseId}"][data-set="${setIndex}"]`,
+  )
+  // Update the field in place: a re-render here would swallow the button click.
+  if (input) input.value = String(next)
+  persist()
+}
+
+function toggleSets(exerciseId: string): void {
+  const exercise = activeProgram?.exercises.find((candidate) => candidate.id === exerciseId)
+  if (!exercise?.sets) return
+  const weights = draft.get(exerciseId) ?? null
+  draft.set(
+    exerciseId,
+    weights && weights.length > 1 ? collapseToSingle(weights) : expandToSets(weights ?? [0], exercise.sets),
+  )
+  render()
+  persist()
+}
+
+app.addEventListener('click', (event) => {
+  const trigger = (event.target as HTMLElement).closest<HTMLElement>('[data-action]')
+  if (!trigger) return
+  const { action, program, ex, set } = trigger.dataset
+
+  switch (action) {
+    case 'open':
+      if (program) openProgram(program)
+      break
+    case 'back':
+      activeProgram = null
+      render()
+      break
+    case 'finish':
+      persist()
+      activeProgram = null
+      render()
+      break
+    case 'inc':
+    case 'dec':
+      if (ex) step(ex, Number(set), action === 'inc' ? 1 : -1)
+      break
+    case 'toggle-sets':
+      if (ex) toggleSets(ex)
+      break
+  }
+})
+
+app.addEventListener('change', (event) => {
+  const input = event.target as HTMLInputElement
+  if (!input.matches('input[data-ex]')) return
+  const exerciseId = input.dataset.ex!
+  const setIndex = Number(input.dataset.set)
+  const value = Number.parseFloat(input.value)
+
+  if (!Number.isFinite(value) || value < 0) {
+    const weights = draft.get(exerciseId) ?? null
+    input.value = weights === null ? '' : String(weightAt(weights, setIndex))
+    return
+  }
+  updateWeight(exerciseId, setIndex, value)
+  persist()
+})
+
+render()
+registerSW({ immediate: true })

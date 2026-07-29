@@ -1,0 +1,107 @@
+{
+  "weightStep": 2.5,
+  "programs": [
+    {
+      "id": "a",
+      "name": "Workout A",
+      "day": "Tuesday",
+      "exercises": [
+        {
+          "id": "warmup-bike",
+          "name": "Warm-up: Stationary Bike",
+          "reps": "5 min",
+          "tracksWeight": false,
+          "note": "Seated, back stays unloaded"
+        },
+        {
+          "id": "leg-press",
+          "name": "Leg Press",
+          "sets": 3,
+          "reps": "10-12",
+          "note": "Short range: stop before the pelvis tucks"
+        },
+        {
+          "id": "chest-press",
+          "name": "Seated Chest Press",
+          "sets": 3,
+          "reps": "10-12"
+        },
+        {
+          "id": "lat-pulldown",
+          "name": "Lat Pulldown",
+          "sets": 3,
+          "reps": "10-12",
+          "note": "No torso swing"
+        },
+        {
+          "id": "glute-bridge",
+          "name": "Glute Bridge (dumbbell)",
+          "sets": 3,
+          "reps": "10-12",
+          "note": "Stop at a straight line, do not arch the lower back"
+        },
+        {
+          "id": "bird-dog",
+          "name": "Bird Dog",
+          "sets": 3,
+          "reps": "8 per side",
+          "tracksWeight": false,
+          "note": "Hold 5-8 sec, keep the hips level"
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "name": "Workout B",
+      "day": "Saturday",
+      "exercises": [
+        {
+          "id": "warmup",
+          "name": "Warm-up",
+          "reps": "5 min",
+          "tracksWeight": false
+        },
+        {
+          "id": "lying-leg-curl",
+          "name": "Lying Leg Curl",
+          "sets": 3,
+          "reps": "12-15"
+        },
+        {
+          "id": "seated-cable-row",
+          "name": "Seated Cable Row",
+          "sets": 3,
+          "reps": "10-12",
+          "note": "Pull with the shoulder blades, torso still"
+        },
+        {
+          "id": "seated-dumbbell-press",
+          "name": "Seated Dumbbell Shoulder Press",
+          "sets": 3,
+          "reps": "8-10",
+          "note": "Back against the vertical pad"
+        },
+        {
+          "id": "leg-extension",
+          "name": "Leg Extension",
+          "sets": 2,
+          "reps": "12-15"
+        },
+        {
+          "id": "side-plank",
+          "name": "Side Plank (from knees)",
+          "sets": 3,
+          "reps": "20-30 sec per side",
+          "tracksWeight": false
+        },
+        {
+          "id": "suitcase-carry",
+          "name": "Suitcase Carry",
+          "sets": 3,
+          "reps": "30 m per side",
+          "note": "One dumbbell, do not lean sideways"
+        }
+      ]
+    }
+  ]
+}
