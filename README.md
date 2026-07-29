@@ -14,9 +14,10 @@ control per set.
 Every edit is saved immediately. **Finish** exists for the case where the
 workout happened but no weight changed — it records the session anyway.
 
-The **?** button on an exercise opens its technique guide: photos and a short
-step list. Exercises whose movement has no accurate photo in the source dataset
-show the steps only (see [ADR-0004](docs/adr/0004-bundle-exercise-photos-from-public-domain-database.md)).
+Each exercise shows a thumbnail on the left; tapping it (marked with **?**)
+opens the technique guide with photos and a short step list. Exercises whose
+movement has no accurate photo in the source dataset show a letter placeholder
+and steps only (see [ADR-0004](docs/adr/0004-bundle-exercise-photos-from-public-domain-database.md)).
 
 ## Editing the programs
 

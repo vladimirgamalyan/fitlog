@@ -75,6 +75,29 @@ function renderSetRow(exerciseId: string, weight: number | null, setIndex: numbe
     </div>`
 }
 
+/**
+ * Thumbnail reusing the guide's first photo, so a machine is recognisable
+ * without reading the name. Exercises without a photo keep the same footprint
+ * so the list stays aligned. The whole thumbnail opens the guide — a finger
+ * needs a bigger target than the "?" badge drawn on it.
+ */
+function renderThumb(exercise: Exercise): string {
+  const image = exercise.guide?.images?.[0]
+  const id = escapeHtml(exercise.id)
+  const inner = image
+    ? `<img class="thumb" src="${import.meta.env.BASE_URL}${escapeHtml(image)}"
+            alt="" loading="lazy" />`
+    : `<span class="thumb thumb-empty" aria-hidden="true">${escapeHtml(
+        exercise.name.slice(0, 1),
+      )}</span>`
+
+  if (!exercise.guide) return `<div class="thumb-wrap">${inner}</div>`
+  return `
+    <button class="thumb-wrap" data-action="info" data-ex="${id}" aria-label="How to do it">
+      ${inner}<span class="info" aria-hidden="true">?</span>
+    </button>`
+}
+
 function renderExercise(exercise: Exercise, weights: number[] | null): string {
   const id = escapeHtml(exercise.id)
   const note = exercise.note ? `<p class="note">${escapeHtml(exercise.note)}</p>` : ''
@@ -85,27 +108,27 @@ function renderExercise(exercise: Exercise, weights: number[] | null): string {
         perSet ? 'same' : 'per set'
       }</button>`
     : ''
-  const info = exercise.guide
-    ? `<button class="info" data-action="info" data-ex="${id}" aria-label="How to do it">?</button>`
-    : ''
-
-  let body = ''
+  let rows = ''
   if (isWeighted(exercise)) {
-    body = perSet
+    rows = perSet
       ? weights.map((weight, index) => renderSetRow(id, weight, index)).join('')
       : renderSetRow(id, weights === null ? null : weights[0]!, null)
   }
+  // The toggle sits with the weights, not in the title row: the name needs
+  // every pixel it can get before it wraps.
+  const body = rows ? `<div class="sets">${toggle}${rows}</div>` : ''
 
   return `
     <section class="exercise">
-      <div class="exercise-head">
-        <span class="exercise-name">${escapeHtml(exercise.name)}</span>
-        <span class="prescription">${escapeHtml(prescription(exercise))}</span>
-        ${info}
-        ${toggle}
+      ${renderThumb(exercise)}
+      <div class="exercise-body">
+        <div class="exercise-head">
+          <span class="exercise-name">${escapeHtml(exercise.name)}</span>
+          <span class="prescription">${escapeHtml(prescription(exercise))}</span>
+        </div>
+        ${note}
+        ${body}
       </div>
-      ${note}
-      ${body}
     </section>`
 }
 

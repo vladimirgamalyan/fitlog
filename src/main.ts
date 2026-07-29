@@ -53,6 +53,26 @@ function persist(): void {
   saveLog(log)
 }
 
+let flashTimer: number | undefined
+
+/**
+ * Confirms a backup on the button itself. A download is otherwise invisible:
+ * the file lands in the download folder with no sign the tap registered.
+ */
+function flash(button: HTMLElement, message: string): void {
+  window.clearTimeout(flashTimer)
+  // Keep the original label in a data attribute so a second tap mid-flash
+  // does not adopt "Saved" as the button's name.
+  const original = button.dataset.label ?? button.textContent ?? ''
+  button.dataset.label = original
+  button.textContent = message
+  button.classList.add('flash')
+  flashTimer = window.setTimeout(() => {
+    button.textContent = original
+    button.classList.remove('flash')
+  }, 2000)
+}
+
 function weightAt(weights: number[] | null, setIndex: number): number {
   if (!weights || weights.length === 0) return 0
   return weights[Math.min(setIndex, weights.length - 1)]!
@@ -132,11 +152,14 @@ app.addEventListener('click', (event) => {
     case 'share-backup':
       // Fall back to a download if the share sheet refuses the file.
       void shareBackup(log, todayISO()).then((ok) => {
-        if (!ok) downloadBackup(log, todayISO())
+        if (ok) return
+        downloadBackup(log, todayISO())
+        flash(trigger, 'Saved instead')
       })
       break
     case 'save-backup':
       downloadBackup(log, todayISO())
+      flash(trigger, 'Saved ✓')
       break
   }
 })

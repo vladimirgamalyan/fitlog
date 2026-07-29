@@ -5,7 +5,8 @@
   --text: #16181d;
   --muted: #6b7280;
   --accent: #1f6feb;
-  --tap: 60px;
+  --done: #1a7f37;
+  --tap: 48px;
 }
 
 * {
@@ -105,6 +106,11 @@ body {
   cursor: pointer;
 }
 
+.secondary.flash {
+  border-color: var(--done);
+  color: var(--done);
+}
+
 .backup-note {
   flex-basis: 100%;
   margin: 0;
@@ -121,10 +127,47 @@ body {
 }
 
 .exercise {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 14px 14px 10px;
+  padding: 12px;
+}
+
+.thumb-wrap {
+  position: relative;
+  flex: none;
+  padding: 0;
+  border: none;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.thumb {
+  width: 62px;
+  height: 62px;
+  display: block;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.thumb-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.exercise-body {
+  flex: 1;
+  min-width: 0;
 }
 
 .exercise-head {
@@ -134,15 +177,31 @@ body {
 }
 
 .exercise-name {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
   flex: 1;
 }
 
 .prescription {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--muted);
   white-space: nowrap;
+}
+
+.sets {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.sets .mode {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+}
+
+.set-row {
+  grid-column: 2;
 }
 
 .mode {
@@ -156,15 +215,19 @@ body {
 }
 
 .info {
-  width: 34px;
-  height: 34px;
-  flex: none;
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--border);
   border-radius: 50%;
-  background: none;
+  background: var(--surface);
   color: var(--accent);
-  font: 600 17px/1 inherit;
-  cursor: pointer;
+  font: 600 14px/1 inherit;
 }
 
 .note {
@@ -218,12 +281,13 @@ body {
 .set-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 10px;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .set-index {
-  width: 18px;
+  margin-right: auto;
   font-size: 14px;
   color: var(--muted);
 }
@@ -232,11 +296,11 @@ body {
   width: var(--tap);
   height: var(--tap);
   flex: none;
-  font-size: 30px;
+  font-size: 26px;
   line-height: 1;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
@@ -245,19 +309,19 @@ body {
 }
 
 .weight {
-  flex: 1;
+  flex: none;
   display: flex;
   align-items: baseline;
-  justify-content: center;
-  gap: 4px;
+  justify-content: flex-end;
+  gap: 3px;
 }
 
 .weight input {
-  width: 5ch;
+  width: 4.5ch;
   padding: 0;
   border: none;
   background: none;
-  font: 700 30px/1 inherit;
+  font: 700 26px/1 inherit;
   text-align: right;
   color: inherit;
 }
