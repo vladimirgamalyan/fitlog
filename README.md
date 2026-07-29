@@ -6,7 +6,7 @@ works offline.
 
 ## Using it
 
-Open the app, pick **Workout A** or **Workout B**, and go down the list. Adjust
+Open the app, pick a workout, and go down the list. Adjust
 a weight with `−` / `+` (2.5 kg per tap) or type it in. Exercises with a
 different weight per set have a **per set** toggle that splits the row into one
 control per set.
@@ -55,15 +55,17 @@ deployment workflow rebuilds and publishes the app.
   "initialWeight": 60,    // optional starting weight before any history exists
   "note": "Short range",  // optional one-line technique cue
   "guide": {              // optional; without it the "?" button is not shown
-    "images": ["exercises/leg-press-0.jpg"],  // optional, relative to public/
+    "images": ["data:image/jpeg;base64,..."],  // optional, self-contained data URLs
     "steps": ["Feet shoulder width...", "..."]
   }
 }
 ```
 
-Guide photos come from [free-exercise-db](https://github.com/yuhonas/free-exercise-db)
-(Unlicense / public domain) and live in `public/exercises/` as
-`<exercise-id>-{0,1}.jpg`.
+The format is documented in full in the `$comment` field of
+`src/programs.json`. Photos are always data URLs inside the file — in the
+bundled demo too; the pack script produces them, and the demo's photos come
+from [free-exercise-db](https://github.com/yuhonas/free-exercise-db)
+(Unlicense / public domain).
 
 Renaming an `id` detaches that exercise's history and resets it — this applies
 to imported programs too, since weights are looked up by the same ids. Names,

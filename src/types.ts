@@ -1,6 +1,6 @@
 /** Technique reference shown behind the "?" button. See ADR-0004. */
 export interface ExerciseGuide {
-  /** Paths relative to the app base; omitted when no accurate photo exists. */
+  /** Self-contained data URLs; omitted when no accurate photo exists. */
   images?: string[]
   steps: string[]
 }

@@ -76,6 +76,12 @@ describe('parseProgramsFile', () => {
     expect(() => parseProgramsFile(JSON.stringify(file))).toThrow('sets')
   })
 
+  it('rejects guide images that are not data URLs', () => {
+    const file = valid() as { programs: { exercises: { guide?: { images: string[] } }[] }[] }
+    file.programs[0]!.exercises[0]!.guide!.images = ['exercises/leg-press-0.jpg']
+    expect(() => parseProgramsFile(JSON.stringify(file))).toThrow('data: URLs')
+  })
+
   it('rejects a guide without steps', () => {
     const file = valid() as { programs: { exercises: { guide?: object }[] }[] }
     file.programs[0]!.exercises[0]!.guide = { images: [] }

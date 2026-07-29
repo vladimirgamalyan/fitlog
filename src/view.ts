@@ -11,12 +11,6 @@ function escapeHtml(value: string): string {
   )
 }
 
-/** Imported programs carry photos as data URLs; bundled ones as public/ paths. */
-function imageSrc(image: string): string {
-  const src = image.startsWith('data:') ? image : `${import.meta.env.BASE_URL}${image}`
-  return escapeHtml(src)
-}
-
 /** "2026-07-26" -> "Jul 26", parsed as a local date to avoid a UTC day shift. */
 function formatDate(iso: string): string {
   const [year, month, day] = iso.split('-').map(Number)
@@ -93,7 +87,7 @@ function renderThumb(exercise: Exercise): string {
   const image = exercise.guide?.images?.[0]
   const id = escapeHtml(exercise.id)
   const inner = image
-    ? `<img class="thumb" src="${imageSrc(image)}"
+    ? `<img class="thumb" src="${escapeHtml(image)}"
             alt="" loading="lazy" />`
     : `<span class="thumb thumb-empty" aria-hidden="true">${escapeHtml(
         exercise.name.slice(0, 1),
@@ -147,7 +141,7 @@ export function renderGuide(exercise: Exercise): string {
   const photos = (guide.images ?? [])
     .map(
       (image, index) =>
-        `<img src="${imageSrc(image)}" loading="lazy"
+        `<img src="${escapeHtml(image)}" loading="lazy"
               alt="${escapeHtml(exercise.name)}, position ${index + 1}" />`,
     )
     .join('')

@@ -16,10 +16,10 @@ export default defineConfig({
       filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
-      // jpg is not in the plugin default: without it the guide photos would
-      // be missing offline, which is exactly where they are needed. woff2
-      // keeps the bundled font available offline too.
-      injectManifest: { globPatterns: ['**/*.{js,css,html,svg,png,jpg,woff2,webmanifest}'] },
+      // woff2 is not in the plugin default; without it the bundled font would
+      // be missing offline. Guide photos need no entry here: they travel as
+      // data URLs inside the program data.
+      injectManifest: { globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'] },
       manifest: {
         name: 'fitlog',
         short_name: 'fitlog',

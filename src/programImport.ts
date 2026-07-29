@@ -78,8 +78,13 @@ function parseGuide(value: unknown, label: string): ExerciseGuide {
   if (!Array.isArray(steps) || steps.length === 0 || !steps.every(isNonEmptyString)) {
     throw new Error(`${label}: guide.steps must be a non-empty array of strings`)
   }
-  if (images !== undefined && (!Array.isArray(images) || !images.every(isNonEmptyString))) {
-    throw new Error(`${label}: guide.images must be an array of strings`)
+  if (
+    images !== undefined &&
+    (!Array.isArray(images) || !images.every((image) => isDataUrl(image)))
+  ) {
+    // A path would render fine on the author's disk but 404 on the deployed
+    // origin, so self-containment is enforced at the door.
+    throw new Error(`${label}: guide.images must be data: URLs`)
   }
   const guide: ExerciseGuide = { steps }
   if (images !== undefined) guide.images = images
@@ -92,4 +97,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.length > 0
+}
+
+function isDataUrl(value: unknown): value is string {
+  return typeof value === 'string' && value.startsWith('data:')
 }
