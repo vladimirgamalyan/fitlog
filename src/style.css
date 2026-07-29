@@ -192,6 +192,11 @@ input {
   color: var(--done);
 }
 
+.secondary.flash-error {
+  border-color: rgba(224, 101, 92, 0.5);
+  color: #e0655c;
+}
+
 .backup-note {
   flex-basis: 100%;
   margin: 0;

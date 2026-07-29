@@ -2,13 +2,16 @@ import { registerSW } from 'virtual:pwa-register'
 import '@fontsource-variable/space-grotesk'
 import './style.css'
 import { canShareFiles, downloadBackup, shareBackup } from './backup'
+import { parseProgramsFile } from './programImport'
 import programsData from './programs.json'
+import { loadImportedPrograms, saveImportedPrograms, takeSharedProgram } from './programStore'
 import { loadLog, recordSession, saveLog, todayISO } from './storage'
 import type { Program, ProgramsFile, SessionEntry } from './types'
 import { collapseToSingle, expandToSets, isWeighted, resolveWeights } from './weights'
 import { type Draft, renderGuide, renderPicker, renderWorkout } from './view'
 
-const { weightStep, programs } = programsData as ProgramsFile
+// The bundled file is a demo; an imported program replaces it at startup.
+let { weightStep, programs } = programsData as ProgramsFile
 const app = document.querySelector<HTMLDivElement>('#app')!
 
 let log = loadLog()
@@ -89,18 +92,62 @@ let flashTimer: number | undefined
  * Confirms a backup on the button itself. A download is otherwise invisible:
  * the file lands in the download folder with no sign the tap registered.
  */
-function flash(button: HTMLElement, message: string): void {
+function flash(button: HTMLElement, message: string, isError = false): void {
   window.clearTimeout(flashTimer)
   // Keep the original label in a data attribute so a second tap mid-flash
   // does not adopt "Saved" as the button's name.
   const original = button.dataset.label ?? button.textContent ?? ''
   button.dataset.label = original
   button.textContent = message
-  button.classList.add('flash')
+  button.classList.add(isError ? 'flash-error' : 'flash')
+  // Errors carry a reason worth reading, so they stay up longer.
   flashTimer = window.setTimeout(() => {
     button.textContent = original
-    button.classList.remove('flash')
-  }, 2000)
+    button.classList.remove('flash', 'flash-error')
+  }, isError ? 4000 : 2000)
+}
+
+/**
+ * Replaces the active programs with the contents of an imported file.
+ * Returns null on success or a message describing why the file was refused.
+ */
+async function importPrograms(text: string): Promise<string | null> {
+  let file: ProgramsFile
+  try {
+    file = parseProgramsFile(text)
+  } catch (error) {
+    return error instanceof Error ? error.message : 'Invalid file'
+  }
+  try {
+    await saveImportedPrograms(file)
+  } catch {
+    return 'Could not save the program on this device'
+  }
+  ;({ weightStep, programs } = file)
+  return null
+}
+
+/** Flashes the import outcome on the "Load program" button, if it is on screen. */
+function reportImport(error: string | null): void {
+  const button = app.querySelector<HTMLElement>('[data-action="load-program"]')
+  if (button) flash(button, error ?? 'Program loaded ✓', error !== null)
+}
+
+async function importProgramsFromFile(file: File): Promise<void> {
+  const error = await importPrograms(await file.text())
+  render()
+  reportImport(error)
+}
+
+function pickProgramFile(): void {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.json,.txt,application/json,text/plain'
+  input.addEventListener('change', () => {
+    const file = input.files?.[0]
+    if (file) void importProgramsFromFile(file)
+  })
+  input.click()
 }
 
 function weightAt(weights: number[] | null, setIndex: number): number {
@@ -183,6 +230,9 @@ app.addEventListener('click', (event) => {
       downloadBackup(log, todayISO())
       flash(trigger, 'Saved ✓')
       break
+    case 'load-program':
+      pickProgramFile()
+      break
   }
 })
 
@@ -206,7 +256,29 @@ window.addEventListener('popstate', (event) => {
   applyHistoryState(event.state as NavState)
 })
 
-// A reload lands on the entry it left, so the screen survives it; a fresh
-// launch has a null entry and shows the picker.
-applyHistoryState(history.state as NavState)
-registerSW({ immediate: true })
+async function init(): Promise<void> {
+  try {
+    const stored = await loadImportedPrograms()
+    if (stored) ({ weightStep, programs } = stored)
+  } catch {
+    // IndexedDB unavailable (e.g. private mode): keep the bundled demo.
+  }
+
+  // A file shared into the app arrives via the service worker, which stashes
+  // its text and redirects here; undefined means nothing was shared.
+  let sharedError: string | null | undefined
+  try {
+    const shared = await takeSharedProgram()
+    if (shared !== null) sharedError = await importPrograms(shared)
+  } catch {
+    // Same: without IndexedDB there is nothing stashed to pick up.
+  }
+
+  // A reload lands on the entry it left, so the screen survives it; a fresh
+  // launch has a null entry and shows the picker.
+  applyHistoryState(history.state as NavState)
+  if (sharedError !== undefined) reportImport(sharedError)
+  registerSW({ immediate: true })
+}
+
+void init()

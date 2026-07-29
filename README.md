@@ -21,7 +21,28 @@ and steps only (see [ADR-0004](docs/adr/0004-bundle-exercise-photos-from-public-
 
 ## Editing the programs
 
-Programs are data, not settings: edit `src/programs.json` and push. The
+The bundled `src/programs.json` is a demo. Personal programs are built on a
+computer and imported on the phone, so they never enter this public repository
+(see [ADR-0007](docs/adr/0007-programs-imported-as-a-self-contained-file.md)):
+
+1. Put a `programs.json` (same schema as the demo) and its photos in a folder
+   outside the repo, with `guide.images` given as paths relative to that
+   folder.
+2. Pack it into one self-contained file — photos are inlined as data URLs:
+
+   ```sh
+   node scripts/pack-program.mjs path/to/folder fitlog-program.json
+   ```
+
+3. Get the file onto the phone (send it to yourself in Telegram, for
+   example) and either share it straight to the installed **fitlog** app from
+   the Android share sheet, or save it and use **Load program** on the program
+   picker.
+
+The imported program is stored on the device (IndexedDB), works offline, and
+replaces the demo from then on; importing another file replaces it again.
+
+To change the bundled demo instead: edit `src/programs.json` and push. The
 deployment workflow rebuilds and publishes the app.
 
 ```jsonc
@@ -44,8 +65,9 @@ Guide photos come from [free-exercise-db](https://github.com/yuhonas/free-exerci
 (Unlicense / public domain) and live in `public/exercises/` as
 `<exercise-id>-{0,1}.jpg`.
 
-Renaming an `id` detaches that exercise's history and resets it. Names, notes,
-reps and order can be changed freely.
+Renaming an `id` detaches that exercise's history and resets it — this applies
+to imported programs too, since weights are looked up by the same ids. Names,
+notes, reps and order can be changed freely.
 
 ## Where the data lives
 
