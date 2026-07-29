@@ -1,4 +1,5 @@
 import { registerSW } from 'virtual:pwa-register'
+import '@fontsource-variable/space-grotesk'
 import './style.css'
 import { canShareFiles, downloadBackup, shareBackup } from './backup'
 import programsData from './programs.json'

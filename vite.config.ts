@@ -11,8 +11,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
       // jpg is not in the plugin default: without it the guide photos would
-      // be missing offline, which is exactly where they are needed.
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,jpg,webmanifest}'] },
+      // be missing offline, which is exactly where they are needed. woff2
+      // keeps the bundled font available offline too.
+      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,jpg,woff2,webmanifest}'] },
       manifest: {
         name: 'fitlog',
         short_name: 'fitlog',
@@ -21,8 +22,8 @@ export default defineConfig({
         scope: base,
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#ffffff',
-        theme_color: '#1f6feb',
+        background_color: '#0b0c0f',
+        theme_color: '#0b0c0f',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },

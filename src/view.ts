@@ -43,15 +43,16 @@ export function renderPicker(programs: Program[], log: WorkoutLog, shareable: bo
   const cards = programs
     .map((program) => {
       const last = lastTrainedDate(log, program.id)
-      const subtitle = last ? `${program.day} · last ${formatDate(last)}` : program.day
+      const subtitle = last ? `Last session · ${formatDate(last)}` : 'No sessions yet'
       return `
         <button class="program" data-action="open" data-program="${escapeHtml(program.id)}">
+          <span class="program-day">${escapeHtml(program.day)}</span>
           <span class="program-name">${escapeHtml(program.name)}</span>
           <span class="program-sub">${escapeHtml(subtitle)}</span>
         </button>`
     })
     .join('')
-  return `<header class="app-header"><h1>fitlog</h1></header><main class="picker">${cards}${renderBackup(
+  return `<header class="app-header"><h1 class="wordmark">fitlog</h1></header><main class="picker">${cards}${renderBackup(
     log,
     shareable,
   )}</main>`
@@ -105,7 +106,7 @@ function renderExercise(exercise: Exercise, weights: number[] | null): string {
   const canSplit = isWeighted(exercise) && exercise.sets !== undefined && exercise.sets > 1
   const toggle = canSplit
     ? `<button class="mode" data-action="toggle-sets" data-ex="${id}">${
-        perSet ? 'same' : 'per set'
+        perSet ? 'same weight' : 'per-set weights'
       }</button>`
     : ''
   let rows = ''
@@ -114,9 +115,10 @@ function renderExercise(exercise: Exercise, weights: number[] | null): string {
       ? weights.map((weight, index) => renderSetRow(id, weight, index)).join('')
       : renderSetRow(id, weights === null ? null : weights[0]!, null)
   }
-  // The toggle sits with the weights, not in the title row: the name needs
-  // every pixel it can get before it wraps.
-  const body = rows ? `<div class="sets">${toggle}${rows}</div>` : ''
+  // The toggle sits under the weights, not beside them: the stepper row alone
+  // is wider than the space next to the thumbnail on narrow phones, so a
+  // side-by-side toggle would overlap it.
+  const body = rows ? `<div class="sets">${rows}${toggle}</div>` : ''
 
   return `
     <section class="exercise">
