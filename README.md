@@ -42,6 +42,13 @@ computer and imported on the phone, so they never enter this public repository
 The imported program is stored on the device (IndexedDB), works offline, and
 replaces the demo from then on; importing another file replaces it again.
 
+The phone can hand the program back out — **Send program** and **Save program**
+on the picker export exactly what the app is running, in the same format
+`Load program` accepts. Useful for moving the program to a second device, or
+for recovering it when the computer's copy is gone. The export is what the app
+parsed, so anything it ignores (the `$comment` block, unknown fields) is not in
+the file that comes out.
+
 To change the bundled demo instead: edit `src/programs.json` and push. The
 deployment workflow rebuilds and publishes the app.
 
@@ -78,14 +85,16 @@ never leaves the device unless you send it somewhere yourself. Clearing the
 browser's site data deletes it permanently, so take a backup from the program
 picker now and then:
 
-- **Send backup** opens the Android share sheet (Telegram, mail, anything
+- **Send history** opens the Android share sheet (Telegram, mail, anything
   else). The file is named `.txt` because Chromium refuses to share `.json`;
   its contents are still JSON — see
   [ADR-0005](docs/adr/0005-backup-via-web-share-with-download-fallback.md).
-- **Save file** downloads `fitlog-<date>.json` to the device.
+- **Save history** downloads `fitlog-<date>.json` to the device.
 
-There is no import: restoring means writing the JSON back into `localStorage`
-by hand.
+**Send program** and **Save program** export the program the same two ways, as
+`fitlog-program-<date>`. The program is the one thing here that can be imported
+back; the history cannot — restoring it means writing the JSON into
+`localStorage` by hand.
 
 **Clear history** erases every logged session, and with it the weights the app
 starts each exercise from. It takes two taps — the first arms the button, the

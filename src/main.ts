@@ -1,7 +1,7 @@
 import { registerSW } from 'virtual:pwa-register'
 import '@fontsource-variable/space-grotesk'
 import './style.css'
-import { canShareFiles, downloadBackup, shareBackup } from './backup'
+import { backupName, canShareFiles, downloadFile, programName, serialize, shareFile } from './backup'
 import { parseProgramsFile } from './programImport'
 import programsData from './programs.json'
 import { loadImportedPrograms, saveImportedPrograms, takeSharedProgram } from './programStore'
@@ -23,6 +23,14 @@ let workoutScrollY = 0
 
 function activeExercise() {
   return activeProgram?.exercises.find((candidate) => candidate.id === activeExerciseId)
+}
+
+/**
+ * The program data as an importable file. Exporting it lets a phone hand the
+ * program on to another device, or back to a computer that lost the original.
+ */
+function currentPrograms(): ProgramsFile {
+  return { weightStep, programs }
 }
 
 function render(): void {
@@ -105,6 +113,24 @@ function flash(button: HTMLElement, message: string, isError = false): void {
     button.textContent = original
     button.classList.remove('flash', 'flash-error')
   }, isError ? 4000 : 2000)
+}
+
+/**
+ * Hands a file to the share sheet, falling back to a download when the sheet
+ * refuses it. The two destinations need different extensions, so the name is
+ * built per destination rather than passed in ready-made.
+ */
+function sendFile(
+  button: HTMLElement,
+  text: string,
+  name: (date: string, extension: 'json' | 'txt') => string,
+  title: string,
+): void {
+  void shareFile(text, name(todayISO(), 'txt'), title).then((ok) => {
+    if (ok) return
+    downloadFile(text, name(todayISO(), 'json'))
+    flash(button, 'Saved instead')
+  })
 }
 
 /**
@@ -235,15 +261,17 @@ app.addEventListener('click', (event) => {
       if (ex) toggleSets(ex)
       break
     case 'share-backup':
-      // Fall back to a download if the share sheet refuses the file.
-      void shareBackup(log, todayISO()).then((ok) => {
-        if (ok) return
-        downloadBackup(log, todayISO())
-        flash(trigger, 'Saved instead')
-      })
+      sendFile(trigger, serialize(log), backupName, 'fitlog history')
       break
     case 'save-backup':
-      downloadBackup(log, todayISO())
+      downloadFile(serialize(log), backupName(todayISO(), 'json'))
+      flash(trigger, 'Saved ✓')
+      break
+    case 'share-program':
+      sendFile(trigger, serialize(currentPrograms()), programName, 'fitlog program')
+      break
+    case 'save-program':
+      downloadFile(serialize(currentPrograms()), programName(todayISO(), 'json'))
       flash(trigger, 'Saved ✓')
       break
     case 'load-program':

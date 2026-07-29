@@ -1,11 +1,17 @@
-import type { WorkoutLog } from './types'
+import type { ProgramsFile, WorkoutLog } from './types'
 
-export function serializeLog(log: WorkoutLog): string {
-  return JSON.stringify(log, null, 2)
+/** Indented so an exported file can be read and edited by hand. */
+export function serialize(value: WorkoutLog | ProgramsFile): string {
+  return JSON.stringify(value, null, 2)
 }
 
 export function backupName(date: string, extension: 'json' | 'txt'): string {
   return `fitlog-${date}.${extension}`
+}
+
+/** Distinct from the history's name: both land in the same download folder. */
+export function programName(date: string, extension: 'json' | 'txt'): string {
+  return `fitlog-program-${date}.${extension}`
 }
 
 /**
@@ -25,21 +31,21 @@ export function canShareFiles(): boolean {
   }
 }
 
-export function downloadBackup(log: WorkoutLog, date: string): void {
-  const blob = new Blob([serializeLog(log)], { type: 'application/json' })
+export function downloadFile(text: string, filename: string): void {
+  const blob = new Blob([text], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = backupName(date, 'json')
+  link.download = filename
   link.click()
   URL.revokeObjectURL(url)
 }
 
 /** Returns false when the share failed for a reason other than the user cancelling. */
-export async function shareBackup(log: WorkoutLog, date: string): Promise<boolean> {
-  const file = new File([serializeLog(log)], backupName(date, 'txt'), { type: 'text/plain' })
+export async function shareFile(text: string, filename: string, title: string): Promise<boolean> {
+  const file = new File([text], filename, { type: 'text/plain' })
   try {
-    await navigator.share({ files: [file], title: 'fitlog backup' })
+    await navigator.share({ files: [file], title })
     return true
   } catch (error) {
     return (error as Error).name === 'AbortError'

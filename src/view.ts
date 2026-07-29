@@ -28,16 +28,19 @@ function renderBackup(log: WorkoutLog, shareable: boolean): string {
     count === 0
       ? 'No workouts logged yet'
       : `${count} workout${count === 1 ? '' : 's'} logged`
-  const share = shareable
-    ? `<button class="secondary" data-action="share-backup">Send backup</button>`
-    : ''
+  // History and program are exported the same way, so the buttons name what
+  // they carry rather than how: "Save file" alone would be ambiguous here.
+  const send = (action: string, label: string) =>
+    shareable ? `<button class="secondary" data-action="${action}">${label}</button>` : ''
   // Nothing to lose on an empty log, so the destructive button stays out of the way.
   const clear =
     count === 0 ? '' : `<button class="secondary" data-action="clear-history">Clear history</button>`
   return `
     <footer class="backup">
-      ${share}
-      <button class="secondary" data-action="save-backup">Save file</button>
+      ${send('share-backup', 'Send history')}
+      <button class="secondary" data-action="save-backup">Save history</button>
+      ${send('share-program', 'Send program')}
+      <button class="secondary" data-action="save-program">Save program</button>
       <button class="secondary" data-action="load-program">Load program</button>
       ${clear}
       <p class="backup-note">${summary}</p>
