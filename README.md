@@ -7,9 +7,9 @@ works offline.
 ## Using it
 
 Open the app, pick a workout, and go down the list. Adjust a weight with `−` /
-`+` (`weightStep` from the program file, 1 kg in the demo) or type it in.
-Exercises with a different weight per set have a **per set** toggle that splits
-the row into one control per set.
+`+` (0.5 kg per tap) or type it in — typing takes any value, the step applies
+to the buttons only. Exercises with a different weight per set have a **per
+set** toggle that splits the row into one control per set.
 
 Every edit is saved immediately. **Finish** exists for the case where the
 workout happened but no weight changed — it records the session anyway.
@@ -73,6 +73,12 @@ The format is documented in full in the `$comment` field of
 bundled demo too; the pack script produces them, and the demo's photos come
 from [free-exercise-db](https://github.com/yuhonas/free-exercise-db)
 (Unlicense / public domain).
+
+The `−` / `+` step is not in the file. It is `WEIGHT_STEP` in `src/main.ts`, so
+changing it is a commit rather than a re-import — see
+[ADR-0008](docs/adr/0008-weight-step-is-an-app-constant-not-a-program-field.md).
+A program packed before that change still carries `weightStep`; it imports
+fine, the field is ignored.
 
 Renaming an `id` detaches that exercise's history and resets it — this applies
 to imported programs too, since weights are looked up by the same ids. Names,

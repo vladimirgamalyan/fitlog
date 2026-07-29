@@ -10,8 +10,11 @@ import type { Program, ProgramsFile, SessionEntry } from './types'
 import { collapseToSingle, expandToSets, isWeighted, resolveWeights } from './weights'
 import { type Draft, renderGuide, renderPicker, renderWorkout } from './view'
 
+/** Kilograms added or removed by one tap of the -/+ buttons. See ADR-0008. */
+const WEIGHT_STEP = 0.5
+
 // The bundled file is a demo; an imported program replaces it at startup.
-let { weightStep, programs } = programsData as ProgramsFile
+let { programs } = programsData as ProgramsFile
 const app = document.querySelector<HTMLDivElement>('#app')!
 
 let log = loadLog()
@@ -30,7 +33,7 @@ function activeExercise() {
  * program on to another device, or back to a computer that lost the original.
  */
 function currentPrograms(): ProgramsFile {
-  return { weightStep, programs }
+  return { programs }
 }
 
 function render(): void {
@@ -149,7 +152,7 @@ async function importPrograms(text: string): Promise<string | null> {
   } catch {
     return 'Could not save the program on this device'
   }
-  ;({ weightStep, programs } = file)
+  ;({ programs } = file)
   return null
 }
 
@@ -207,7 +210,7 @@ function updateWeight(exerciseId: string, setIndex: number, value: number): numb
 
 function step(exerciseId: string, setIndex: number, direction: 1 | -1): void {
   const current = weightAt(draft.get(exerciseId) ?? null, setIndex)
-  const next = Math.max(0, Math.round((current + direction * weightStep) * 100) / 100)
+  const next = Math.max(0, Math.round((current + direction * WEIGHT_STEP) * 100) / 100)
   updateWeight(exerciseId, setIndex, next)
   const input = app.querySelector<HTMLInputElement>(
     `input[data-ex="${exerciseId}"][data-set="${setIndex}"]`,
@@ -313,7 +316,7 @@ window.addEventListener('popstate', (event) => {
 async function init(): Promise<void> {
   try {
     const stored = await loadImportedPrograms()
-    if (stored) ({ weightStep, programs } = stored)
+    if (stored) ({ programs } = stored)
   } catch {
     // IndexedDB unavailable (e.g. private mode): keep the bundled demo.
   }

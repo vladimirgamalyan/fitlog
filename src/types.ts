@@ -33,8 +33,6 @@ export interface Program {
 }
 
 export interface ProgramsFile {
-  /** Increment used by the -/+ buttons, in kg. */
-  weightStep: number
   programs: Program[]
 }
 

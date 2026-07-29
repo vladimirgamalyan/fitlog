@@ -14,10 +14,7 @@ export function parseProgramsFile(text: string): ProgramsFile {
   }
   if (!isRecord(data)) throw new Error('Expected a JSON object')
 
-  const { weightStep, programs } = data
-  if (typeof weightStep !== 'number' || !Number.isFinite(weightStep) || weightStep <= 0) {
-    throw new Error('weightStep must be a positive number')
-  }
+  const { programs } = data
   if (!Array.isArray(programs) || programs.length === 0) {
     throw new Error('programs must be a non-empty array')
   }
@@ -25,7 +22,7 @@ export function parseProgramsFile(text: string): ProgramsFile {
   if (new Set(parsed.map((program) => program.id)).size !== parsed.length) {
     throw new Error('program ids must be unique')
   }
-  return { weightStep, programs: parsed }
+  return { programs: parsed }
 }
 
 function parseProgram(value: unknown, index: number): Program {

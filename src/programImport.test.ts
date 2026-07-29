@@ -4,7 +4,6 @@ import bundled from './programs.json'
 
 function valid(): Record<string, unknown> {
   return {
-    weightStep: 2.5,
     programs: [
       {
         id: 'a',
@@ -27,7 +26,6 @@ function valid(): Record<string, unknown> {
 describe('parseProgramsFile', () => {
   it('accepts a valid file', () => {
     const file = parseProgramsFile(JSON.stringify(valid()))
-    expect(file.weightStep).toBe(2.5)
     expect(file.programs[0]!.exercises[0]!.guide!.images![0]).toMatch(/^data:/)
   })
 
@@ -43,18 +41,16 @@ describe('parseProgramsFile', () => {
     expect(() => parseProgramsFile('[1,2]')).toThrow('Expected a JSON object')
   })
 
-  it('rejects a missing or non-positive weightStep', () => {
+  it('still accepts a file written before the step moved into the app', () => {
     const file = valid()
-    delete file.weightStep
-    expect(() => parseProgramsFile(JSON.stringify(file))).toThrow('weightStep')
-    file.weightStep = 0
-    expect(() => parseProgramsFile(JSON.stringify(file))).toThrow('weightStep')
+    file.weightStep = 2.5
+    const parsed = parseProgramsFile(JSON.stringify(file))
+    expect('weightStep' in parsed).toBe(false)
+    expect(parsed.programs).toHaveLength(1)
   })
 
   it('rejects an empty programs array', () => {
-    expect(() => parseProgramsFile(JSON.stringify({ weightStep: 2.5, programs: [] }))).toThrow(
-      'programs',
-    )
+    expect(() => parseProgramsFile(JSON.stringify({ programs: [] }))).toThrow('programs')
   })
 
   it('rejects duplicate program ids', () => {

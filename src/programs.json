@@ -9,10 +9,8 @@
     "entered during workouts are stored separately on the device — never here.",
     "",
     "Top level:",
-    "  weightStep - number > 0: kilograms added/removed by one tap of the -/+",
-    "               buttons on a weight.",
-    "  programs   - non-empty array of programs, one per training day; the",
-    "               picker screen lists them in this order. Ids must be unique.",
+    "  programs - non-empty array of programs, one per training day; the picker",
+    "             screen lists them in this order. Ids must be unique.",
     "",
     "Program fields:",
     "  id        - string, stable key. Weight history is stored under the pair",
@@ -50,9 +48,10 @@
     "",
     "Every imported file is validated against the rules above; a file that",
     "breaks them is refused with the reason shown on the button. Unknown fields,",
-    "including this $comment, are ignored and dropped on import."
+    "including this $comment, are ignored and dropped on import. That covers",
+    "'weightStep' too: the -/+ step used to live here and is now fixed by the",
+    "app, so a file written before that change still imports (see ADR-0008)."
   ],
-  "weightStep": 1,
   "programs": [
     {
       "id": "a",
