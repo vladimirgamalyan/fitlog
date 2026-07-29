@@ -4,25 +4,34 @@ import programsData from './programs.json'
 import { loadLog, recordSession, saveLog, todayISO } from './storage'
 import type { Program, ProgramsFile, SessionEntry } from './types'
 import { collapseToSingle, expandToSets, isWeighted, resolveWeights } from './weights'
-import { type Draft, renderPicker, renderWorkout } from './view'
+import { type Draft, renderGuide, renderPicker, renderWorkout } from './view'
 
 const { weightStep, programs } = programsData as ProgramsFile
 const app = document.querySelector<HTMLDivElement>('#app')!
 
 let log = loadLog()
 let activeProgram: Program | null = null
+let activeExerciseId: string | null = null
 let draft: Draft = new Map()
+/** Restored when returning from a guide, so the list does not jump to the top. */
+let workoutScrollY = 0
+
+function activeExercise() {
+  return activeProgram?.exercises.find((candidate) => candidate.id === activeExerciseId)
+}
 
 function render(): void {
-  app.innerHTML = activeProgram
-    ? renderWorkout(activeProgram, draft)
-    : renderPicker(programs, log)
+  const exercise = activeExercise()
+  if (activeProgram && exercise) app.innerHTML = renderGuide(exercise)
+  else if (activeProgram) app.innerHTML = renderWorkout(activeProgram, draft)
+  else app.innerHTML = renderPicker(programs, log)
 }
 
 function openProgram(programId: string): void {
   const program = programs.find((candidate) => candidate.id === programId)
   if (!program) return
   activeProgram = program
+  activeExerciseId = null
   draft = new Map(
     program.exercises.map((exercise) => [exercise.id, resolveWeights(log, program.id, exercise)]),
   )
@@ -90,8 +99,22 @@ app.addEventListener('click', (event) => {
       if (program) openProgram(program)
       break
     case 'back':
-      activeProgram = null
-      render()
+      if (activeExerciseId) {
+        activeExerciseId = null
+        render()
+        window.scrollTo(0, workoutScrollY)
+      } else {
+        activeProgram = null
+        render()
+      }
+      break
+    case 'info':
+      if (ex) {
+        workoutScrollY = window.scrollY
+        activeExerciseId = ex
+        render()
+        window.scrollTo(0, 0)
+      }
       break
     case 'finish':
       persist()

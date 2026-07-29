@@ -18,27 +18,63 @@
           "name": "Leg Press",
           "sets": 3,
           "reps": "10-12",
-          "note": "Short range: stop before the pelvis tucks"
+          "note": "Short range: stop before the pelvis tucks",
+          "guide": {
+            "images": ["exercises/leg-press-0.jpg", "exercises/leg-press-1.jpg"],
+            "steps": [
+              "Feet shoulder width on the middle of the platform, back and hips flat against the seat.",
+              "Lower only as far as the pelvis stays pinned to the seat. The moment the tailbone starts to curl up, the range is over.",
+              "Press through the heels and stop short of locking the knees.",
+              "Prefer more weight over more depth: depth is what loads the spine here, not the weight."
+            ]
+          }
         },
         {
           "id": "chest-press",
           "name": "Seated Chest Press",
           "sets": 3,
-          "reps": "10-12"
+          "reps": "10-12",
+          "guide": {
+            "images": ["exercises/chest-press-0.jpg", "exercises/chest-press-1.jpg"],
+            "steps": [
+              "Set the seat height so the handles line up with the middle of the chest.",
+              "Back and head stay against the pad for the whole set.",
+              "Press until the elbows are almost straight, then return under control.",
+              "Do not let the shoulders roll forward at the end of the press."
+            ]
+          }
         },
         {
           "id": "lat-pulldown",
           "name": "Lat Pulldown",
           "sets": 3,
           "reps": "10-12",
-          "note": "No torso swing"
+          "note": "No torso swing",
+          "guide": {
+            "images": ["exercises/lat-pulldown-0.jpg", "exercises/lat-pulldown-1.jpg"],
+            "steps": [
+              "Grip slightly wider than the shoulders, thighs locked under the pads.",
+              "Lean back a few degrees and hold that angle — the torso does not rock.",
+              "Pull the bar to the upper chest by driving the elbows down and back.",
+              "Let the bar rise under control without the shoulders yanking at the top."
+            ]
+          }
         },
         {
           "id": "glute-bridge",
           "name": "Glute Bridge (dumbbell)",
           "sets": 3,
           "reps": "10-12",
-          "note": "Stop at a straight line, do not arch the lower back"
+          "note": "Stop at a straight line, do not arch the lower back",
+          "guide": {
+            "steps": [
+              "Shoulder blades on the bench or the floor, feet flat, heels under the knees.",
+              "Hold the dumbbell across the hip crease with both hands.",
+              "Drive through the heels until torso and thighs form a straight line.",
+              "Stop there: any extra height comes from arching the lower back, not from the glutes.",
+              "Squeeze at the top, then lower under control instead of dropping."
+            ]
+          }
         },
         {
           "id": "bird-dog",
@@ -46,7 +82,15 @@
           "sets": 3,
           "reps": "8 per side",
           "tracksWeight": false,
-          "note": "Hold 5-8 sec, keep the hips level"
+          "note": "Hold 5-8 sec, keep the hips level",
+          "guide": {
+            "steps": [
+              "Hands under the shoulders, knees under the hips, spine neutral.",
+              "Extend the opposite arm and leg only to shoulder and hip height.",
+              "Keep the hips level — the raised side must not rotate upward.",
+              "Hold 5-8 seconds, return under control, then switch sides."
+            ]
+          }
         }
       ]
     },
@@ -65,41 +109,96 @@
           "id": "lying-leg-curl",
           "name": "Lying Leg Curl",
           "sets": 3,
-          "reps": "12-15"
+          "reps": "12-15",
+          "guide": {
+            "images": ["exercises/lying-leg-curl-0.jpg", "exercises/lying-leg-curl-1.jpg"],
+            "steps": [
+              "Pad just above the heels, hips flat against the bench.",
+              "Curl until the heels come close to the glutes without the hips lifting.",
+              "Lower slowly — the negative is the point of this one."
+            ]
+          }
         },
         {
           "id": "seated-cable-row",
           "name": "Seated Cable Row",
           "sets": 3,
           "reps": "10-12",
-          "note": "Pull with the shoulder blades, torso still"
+          "note": "Pull with the shoulder blades, torso still",
+          "guide": {
+            "images": ["exercises/seated-cable-row-0.jpg", "exercises/seated-cable-row-1.jpg"],
+            "steps": [
+              "Knees slightly bent, chest up, torso vertical and still.",
+              "Start the pull by drawing the shoulder blades together, then bend the elbows.",
+              "Bring the handle to the lower ribs with the elbows close to the body.",
+              "Return without letting the torso get dragged forward."
+            ]
+          }
         },
         {
           "id": "seated-dumbbell-press",
           "name": "Seated Dumbbell Shoulder Press",
           "sets": 3,
           "reps": "8-10",
-          "note": "Back against the vertical pad"
+          "note": "Back against the vertical pad",
+          "guide": {
+            "images": [
+              "exercises/seated-dumbbell-press-0.jpg",
+              "exercises/seated-dumbbell-press-1.jpg"
+            ],
+            "steps": [
+              "Back flat against the vertical pad, feet planted on the floor.",
+              "Start with the dumbbells at ear height, elbows slightly in front of the body.",
+              "Press up without a hard lockout and without letting the ribs flare.",
+              "Lower under control back to ear height."
+            ]
+          }
         },
         {
           "id": "leg-extension",
           "name": "Leg Extension",
           "sets": 2,
-          "reps": "12-15"
+          "reps": "12-15",
+          "guide": {
+            "images": ["exercises/leg-extension-0.jpg", "exercises/leg-extension-1.jpg"],
+            "steps": [
+              "Knee joint aligned with the machine's pivot, pad resting on the lower shin.",
+              "Extend smoothly and pause for a beat at the top.",
+              "Lower under control; do not swing the weight up."
+            ]
+          }
         },
         {
           "id": "side-plank",
           "name": "Side Plank (from knees)",
           "sets": 3,
           "reps": "20-30 sec per side",
-          "tracksWeight": false
+          "tracksWeight": false,
+          "guide": {
+            "images": ["exercises/side-plank-0.jpg", "exercises/side-plank-1.jpg"],
+            "steps": [
+              "Elbow directly under the shoulder, knees bent behind you.",
+              "Lift the hips until shoulder, hip and knee form a straight line.",
+              "Keep the hips stacked — the top hip does not rotate forward or back.",
+              "Breathe normally, hold 20-30 seconds, then switch sides.",
+              "Photos show the full version on the feet; you do the same shape from the knees."
+            ]
+          }
         },
         {
           "id": "suitcase-carry",
           "name": "Suitcase Carry",
           "sets": 3,
           "reps": "30 m per side",
-          "note": "One dumbbell, do not lean sideways"
+          "note": "One dumbbell, do not lean sideways",
+          "guide": {
+            "steps": [
+              "One dumbbell in one hand, arm hanging, shoulders level.",
+              "Stand tall and brace the trunk before the first step.",
+              "Walk 30 m without leaning toward or away from the weight.",
+              "Switch hands and repeat, then set the weight down under control."
+            ]
+          }
         }
       ]
     }

@@ -10,6 +10,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
+      // jpg is not in the plugin default: without it the guide photos would
+      // be missing offline, which is exactly where they are needed.
+      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,jpg,webmanifest}'] },
       manifest: {
         name: 'fitlog',
         short_name: 'fitlog',

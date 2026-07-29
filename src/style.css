@@ -128,10 +128,64 @@ body {
   cursor: pointer;
 }
 
+.info {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: none;
+  color: var(--accent);
+  font: 600 17px/1 inherit;
+  cursor: pointer;
+}
+
 .note {
   margin: 6px 0 0;
   font-size: 14px;
   color: var(--muted);
+}
+
+.guide {
+  padding: 16px 16px 40px;
+}
+
+.prescription-line {
+  margin: 0;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.cue {
+  margin: 10px 0 0;
+  padding: 12px 14px;
+  background: var(--surface);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.photos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.photos img {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.steps {
+  margin: 20px 0 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 16px;
 }
 
 .set-row {

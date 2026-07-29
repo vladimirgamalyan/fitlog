@@ -14,6 +14,10 @@ control per set.
 Every edit is saved immediately. **Finish** exists for the case where the
 workout happened but no weight changed — it records the session anyway.
 
+The **?** button on an exercise opens its technique guide: photos and a short
+step list. Exercises whose movement has no accurate photo in the source dataset
+show the steps only (see [ADR-0004](docs/adr/0004-bundle-exercise-photos-from-public-domain-database.md)).
+
 ## Editing the programs
 
 Programs are data, not settings: edit `src/programs.json` and push. The
@@ -27,9 +31,17 @@ deployment workflow rebuilds and publishes the app.
   "reps": "10-12",        // display only: "8 per side", "20-30 sec per side", ...
   "tracksWeight": false,  // optional, default true — false for bodyweight work
   "initialWeight": 60,    // optional starting weight before any history exists
-  "note": "Short range"   // optional one-line technique cue
+  "note": "Short range",  // optional one-line technique cue
+  "guide": {              // optional; without it the "?" button is not shown
+    "images": ["exercises/leg-press-0.jpg"],  // optional, relative to public/
+    "steps": ["Feet shoulder width...", "..."]
+  }
 }
 ```
+
+Guide photos come from [free-exercise-db](https://github.com/yuhonas/free-exercise-db)
+(Unlicense / public domain) and live in `public/exercises/` as
+`<exercise-id>-{0,1}.jpg`.
 
 Renaming an `id` detaches that exercise's history and resets it. Names, notes,
 reps and order can be changed freely.

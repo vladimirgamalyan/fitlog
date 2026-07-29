@@ -65,6 +65,9 @@ function renderExercise(exercise: Exercise, weights: number[] | null): string {
         perSet ? 'same' : 'per set'
       }</button>`
     : ''
+  const info = exercise.guide
+    ? `<button class="info" data-action="info" data-ex="${id}" aria-label="How to do it">?</button>`
+    : ''
 
   let body = ''
   if (isWeighted(exercise)) {
@@ -78,11 +81,38 @@ function renderExercise(exercise: Exercise, weights: number[] | null): string {
       <div class="exercise-head">
         <span class="exercise-name">${escapeHtml(exercise.name)}</span>
         <span class="prescription">${escapeHtml(prescription(exercise))}</span>
+        ${info}
         ${toggle}
       </div>
       ${note}
       ${body}
     </section>`
+}
+
+export function renderGuide(exercise: Exercise): string {
+  const guide = exercise.guide
+  if (!guide) return ''
+  const photos = (guide.images ?? [])
+    .map(
+      (image, index) =>
+        `<img src="${import.meta.env.BASE_URL}${escapeHtml(image)}" loading="lazy"
+              alt="${escapeHtml(exercise.name)}, position ${index + 1}" />`,
+    )
+    .join('')
+  const steps = guide.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join('')
+  const cue = exercise.note ? `<p class="cue">${escapeHtml(exercise.note)}</p>` : ''
+
+  return `
+    <header class="app-header">
+      <button class="back" data-action="back" aria-label="Back">‹</button>
+      <h1>${escapeHtml(exercise.name)}</h1>
+    </header>
+    <main class="guide">
+      <p class="prescription-line">${escapeHtml(prescription(exercise))}</p>
+      ${cue}
+      ${photos ? `<div class="photos">${photos}</div>` : ''}
+      <ol class="steps">${steps}</ol>
+    </main>`
 }
 
 export function renderWorkout(program: Program, draft: Draft): string {

@@ -1,3 +1,10 @@
+/** Technique reference shown behind the "?" button. See ADR-0004. */
+export interface ExerciseGuide {
+  /** Paths relative to the app base; omitted when no accurate photo exists. */
+  images?: string[]
+  steps: string[]
+}
+
 /** A single exercise as prescribed by a program. See ADR-0002 and ADR-0003. */
 export interface Exercise {
   /** Stable key; history is attached to it, so it must never be reused or renamed. */
@@ -13,6 +20,8 @@ export interface Exercise {
   initialWeight?: number
   /** One-line technique cue shown under the name. */
   note?: string
+  /** When present, the exercise gets a "?" button opening the guide screen. */
+  guide?: ExerciseGuide
 }
 
 export interface Program {
