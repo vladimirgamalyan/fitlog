@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { emptyLog, loadLog, recordSession, saveLog, todayISO } from './storage'
+import { clearLog, emptyLog, loadLog, recordSession, saveLog, todayISO } from './storage'
 
 const KEY = 'fitlog.log.v1'
 
@@ -37,6 +37,22 @@ describe('loadLog', () => {
     recordSession(stored, 'a', '2026-07-29', [{ exerciseId: 'leg-press', weights: [80] }])
     saveLog(stored)
     expect(loadLog()).toEqual(stored)
+  })
+})
+
+describe('clearLog', () => {
+  it('forgets every stored session', () => {
+    const stored = emptyLog()
+    recordSession(stored, 'a', '2026-07-29', [{ exerciseId: 'leg-press', weights: [80] }])
+    saveLog(stored)
+    expect(clearLog()).toEqual(emptyLog())
+    expect(loadLog()).toEqual(emptyLog())
+  })
+
+  it('leaves nothing behind in storage', () => {
+    saveLog(emptyLog())
+    clearLog()
+    expect(localStorage.getItem(KEY)).toBeNull()
   })
 })
 

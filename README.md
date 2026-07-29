@@ -87,6 +87,10 @@ picker now and then:
 There is no import: restoring means writing the JSON back into `localStorage`
 by hand.
 
+**Clear history** erases every logged session, and with it the weights the app
+starts each exercise from. It takes two taps — the first arms the button, the
+second erases — and it is not shown when there is nothing logged.
+
 ## Development
 
 ```sh

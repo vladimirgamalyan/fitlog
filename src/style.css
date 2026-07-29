@@ -192,7 +192,8 @@ input {
   color: var(--done);
 }
 
-.secondary.flash-error {
+.secondary.flash-error,
+.secondary.armed {
   border-color: rgba(224, 101, 92, 0.5);
   color: #e0655c;
 }

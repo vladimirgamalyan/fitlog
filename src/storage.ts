@@ -29,6 +29,12 @@ export function saveLog(log: WorkoutLog): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(log))
 }
 
+/** Drops every recorded session and returns the log to work with from now on. */
+export function clearLog(): WorkoutLog {
+  localStorage.removeItem(STORAGE_KEY)
+  return emptyLog()
+}
+
 function sessionId(date: string, programId: string): string {
   return `${date}-${programId}`
 }

@@ -5,7 +5,7 @@ import { canShareFiles, downloadBackup, shareBackup } from './backup'
 import { parseProgramsFile } from './programImport'
 import programsData from './programs.json'
 import { loadImportedPrograms, saveImportedPrograms, takeSharedProgram } from './programStore'
-import { loadLog, recordSession, saveLog, todayISO } from './storage'
+import { clearLog, loadLog, recordSession, saveLog, todayISO } from './storage'
 import type { Program, ProgramsFile, SessionEntry } from './types'
 import { collapseToSingle, expandToSets, isWeighted, resolveWeights } from './weights'
 import { type Draft, renderGuide, renderPicker, renderWorkout } from './view'
@@ -139,6 +139,22 @@ async function importProgramsFromFile(file: File): Promise<void> {
   reportImport(error)
 }
 
+/**
+ * Wiping the history cannot be undone, so it takes two taps: the first arms the
+ * button, the second erases. The armed state lives on the element rather than in
+ * a variable, so any re-render disarms it; it also lapses on its own, so a
+ * button left armed and forgotten does not erase the log on the next tap.
+ */
+function armClearHistory(button: HTMLElement): void {
+  const original = button.textContent ?? ''
+  button.classList.add('armed')
+  button.textContent = 'Tap again to clear'
+  window.setTimeout(() => {
+    button.classList.remove('armed')
+    button.textContent = original
+  }, 4000)
+}
+
 function pickProgramFile(): void {
   const input = document.createElement('input')
   input.type = 'file'
@@ -232,6 +248,16 @@ app.addEventListener('click', (event) => {
       break
     case 'load-program':
       pickProgramFile()
+      break
+    case 'clear-history':
+      if (!trigger.classList.contains('armed')) {
+        armClearHistory(trigger)
+        break
+      }
+      log = clearLog()
+      // The re-drawn footer says "No workouts logged yet": the confirmation is
+      // the picker itself, so no flash is needed.
+      render()
       break
   }
 })
