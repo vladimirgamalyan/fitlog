@@ -49,8 +49,18 @@ reps and order can be changed freely.
 ## Where the data lives
 
 Workout history is stored in the browser's `localStorage` on the phone and
-never leaves the device. Clearing the browser's site data deletes it
-permanently — there is no export yet.
+never leaves the device unless you send it somewhere yourself. Clearing the
+browser's site data deletes it permanently, so take a backup from the program
+picker now and then:
+
+- **Send backup** opens the Android share sheet (Telegram, mail, anything
+  else). The file is named `.txt` because Chromium refuses to share `.json`;
+  its contents are still JSON — see
+  [ADR-0005](docs/adr/0005-backup-via-web-share-with-download-fallback.md).
+- **Save file** downloads `fitlog-<date>.json` to the device.
+
+There is no import: restoring means writing the JSON back into `localStorage`
+by hand.
 
 ## Development
 

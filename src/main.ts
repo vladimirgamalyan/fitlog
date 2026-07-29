@@ -1,5 +1,6 @@
 import { registerSW } from 'virtual:pwa-register'
 import './style.css'
+import { canShareFiles, downloadBackup, shareBackup } from './backup'
 import programsData from './programs.json'
 import { loadLog, recordSession, saveLog, todayISO } from './storage'
 import type { Program, ProgramsFile, SessionEntry } from './types'
@@ -24,7 +25,7 @@ function render(): void {
   const exercise = activeExercise()
   if (activeProgram && exercise) app.innerHTML = renderGuide(exercise)
   else if (activeProgram) app.innerHTML = renderWorkout(activeProgram, draft)
-  else app.innerHTML = renderPicker(programs, log)
+  else app.innerHTML = renderPicker(programs, log, canShareFiles())
 }
 
 function openProgram(programId: string): void {
@@ -127,6 +128,15 @@ app.addEventListener('click', (event) => {
       break
     case 'toggle-sets':
       if (ex) toggleSets(ex)
+      break
+    case 'share-backup':
+      // Fall back to a download if the share sheet refuses the file.
+      void shareBackup(log, todayISO()).then((ok) => {
+        if (!ok) downloadBackup(log, todayISO())
+      })
+      break
+    case 'save-backup':
+      downloadBackup(log, todayISO())
       break
   }
 })

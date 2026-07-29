@@ -22,7 +22,24 @@ function prescription(exercise: Exercise): string {
   return exercise.sets === undefined ? exercise.reps : `${exercise.sets}×${exercise.reps}`
 }
 
-export function renderPicker(programs: Program[], log: WorkoutLog): string {
+function renderBackup(log: WorkoutLog, shareable: boolean): string {
+  const count = log.sessions.length
+  const summary =
+    count === 0
+      ? 'No workouts logged yet'
+      : `${count} workout${count === 1 ? '' : 's'} logged`
+  const share = shareable
+    ? `<button class="secondary" data-action="share-backup">Send backup</button>`
+    : ''
+  return `
+    <footer class="backup">
+      ${share}
+      <button class="secondary" data-action="save-backup">Save file</button>
+      <p class="backup-note">${summary}</p>
+    </footer>`
+}
+
+export function renderPicker(programs: Program[], log: WorkoutLog, shareable: boolean): string {
   const cards = programs
     .map((program) => {
       const last = lastTrainedDate(log, program.id)
@@ -34,7 +51,10 @@ export function renderPicker(programs: Program[], log: WorkoutLog): string {
         </button>`
     })
     .join('')
-  return `<header class="app-header"><h1>fitlog</h1></header><main class="picker">${cards}</main>`
+  return `<header class="app-header"><h1>fitlog</h1></header><main class="picker">${cards}${renderBackup(
+    log,
+    shareable,
+  )}</main>`
 }
 
 function renderSetRow(exerciseId: string, weight: number | null, setIndex: number | null): string {
