@@ -6,10 +6,10 @@ works offline.
 
 ## Using it
 
-Open the app, pick a workout, and go down the list. Adjust
-a weight with `−` / `+` (2.5 kg per tap) or type it in. Exercises with a
-different weight per set have a **per set** toggle that splits the row into one
-control per set.
+Open the app, pick a workout, and go down the list. Adjust a weight with `−` /
+`+` (`weightStep` from the program file, 1 kg in the demo) or type it in.
+Exercises with a different weight per set have a **per set** toggle that splits
+the row into one control per set.
 
 Every edit is saved immediately. **Finish** exists for the case where the
 workout happened but no weight changed — it records the session anyway.

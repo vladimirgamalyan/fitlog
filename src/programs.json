@@ -52,7 +52,7 @@
     "breaks them is refused with the reason shown on the button. Unknown fields,",
     "including this $comment, are ignored and dropped on import."
   ],
-  "weightStep": 2.5,
+  "weightStep": 1,
   "programs": [
     {
       "id": "a",
