@@ -29,15 +29,44 @@ function render(): void {
   else app.innerHTML = renderPicker(programs, log, canShareFiles())
 }
 
-function openProgram(programId: string): void {
-  const program = programs.find((candidate) => candidate.id === programId)
-  if (!program) return
-  activeProgram = program
-  activeExerciseId = null
-  draft = new Map(
-    program.exercises.map((exercise) => [exercise.id, resolveWeights(log, program.id, exercise)]),
-  )
+/** History entry describing a screen. null (the initial entry) is the picker. */
+type NavState = { programId: string; exerciseId?: string } | null
+
+/**
+ * Navigation lives in the browser history: entering a workout or a guide
+ * pushes an entry, so the phone's system back button walks back through the
+ * app's screens instead of closing the app. The entry's state, not the click
+ * path, decides what is on screen — a back/forward jump of any length lands
+ * on a consistent screen.
+ */
+function applyHistoryState(state: NavState): void {
+  const program = state
+    ? programs.find((candidate) => candidate.id === state.programId)
+    : undefined
+  if (!state || !program) {
+    activeProgram = null
+    activeExerciseId = null
+    render()
+    return
+  }
+  const returningToWorkout =
+    activeProgram?.id === program.id && activeExerciseId !== null && state.exerciseId === undefined
+  if (activeProgram?.id !== program.id) {
+    activeProgram = program
+    draft = new Map(
+      program.exercises.map((exercise) => [exercise.id, resolveWeights(log, program.id, exercise)]),
+    )
+  }
+  activeExerciseId = state.exerciseId ?? null
   render()
+  // Coming back from a guide restores the list position; every other
+  // transition starts at the top.
+  window.scrollTo(0, returningToWorkout ? workoutScrollY : 0)
+}
+
+function navigate(state: NavState): void {
+  history.pushState(state, '')
+  applyHistoryState(state)
 }
 
 function entriesFromDraft(program: Program): SessionEntry[] {
@@ -118,30 +147,22 @@ app.addEventListener('click', (event) => {
 
   switch (action) {
     case 'open':
-      if (program) openProgram(program)
-      break
-    case 'back':
-      if (activeExerciseId) {
-        activeExerciseId = null
-        render()
-        window.scrollTo(0, workoutScrollY)
-      } else {
-        activeProgram = null
-        render()
+      if (program && programs.some((candidate) => candidate.id === program)) {
+        navigate({ programId: program })
       }
       break
+    case 'back':
+      history.back()
+      break
     case 'info':
-      if (ex) {
+      if (ex && activeProgram) {
         workoutScrollY = window.scrollY
-        activeExerciseId = ex
-        render()
-        window.scrollTo(0, 0)
+        navigate({ programId: activeProgram.id, exerciseId: ex })
       }
       break
     case 'finish':
       persist()
-      activeProgram = null
-      render()
+      history.back()
       break
     case 'inc':
     case 'dec':
@@ -181,5 +202,11 @@ app.addEventListener('change', (event) => {
   persist()
 })
 
-render()
+window.addEventListener('popstate', (event) => {
+  applyHistoryState(event.state as NavState)
+})
+
+// A reload lands on the entry it left, so the screen survives it; a fresh
+// launch has a null entry and shows the picker.
+applyHistoryState(history.state as NavState)
 registerSW({ immediate: true })
