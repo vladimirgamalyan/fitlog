@@ -1,3 +1,4 @@
+import type { JournalSession } from './journal'
 import type { Exercise, Program, WorkoutLog } from './types'
 import { isWeighted, lastTrainedDate } from './weights'
 
@@ -11,11 +12,28 @@ function escapeHtml(value: string): string {
   )
 }
 
-/** "2026-07-26" -> "Jul 26", parsed as a local date to avoid a UTC day shift. */
-function formatDate(iso: string): string {
+/** Parsed as a local date: a UTC parse shifts the day for half the world. */
+function parseISODate(iso: string): Date {
   const [year, month, day] = iso.split('-').map(Number)
-  const date = new Date(year!, month! - 1, day!)
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  return new Date(year!, month! - 1, day!)
+}
+
+/** "2026-07-26" -> "Jul 26". */
+function formatDate(iso: string): string {
+  return parseISODate(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+/**
+ * "2026-07-26" -> "Sun, Jul 26". The weekday tells apart two workouts of the
+ * same week; the padded day keeps the journal's date column one width, so the
+ * program names line up under each other.
+ */
+function formatSessionDate(iso: string): string {
+  return parseISODate(iso).toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: '2-digit',
+  })
 }
 
 function prescription(exercise: Exercise): string {
@@ -60,10 +78,62 @@ export function renderPicker(programs: Program[], log: WorkoutLog, shareable: bo
         </button>`
     })
     .join('')
-  return `<header class="app-header"><h1 class="wordmark">fitlog</h1></header><main class="picker">${cards}${renderBackup(
+  // Nothing to read before the first workout, so the link appears with the
+  // history it opens.
+  const journal =
+    log.sessions.length === 0
+      ? ''
+      : `<button class="header-action" data-action="journal">History</button>`
+  return `<header class="app-header"><h1 class="wordmark">fitlog</h1>${journal}</header><main class="picker">${cards}${renderBackup(
     log,
     shareable,
   )}</main>`
+}
+
+/**
+ * The log as it was recorded: weights only, never the current prescription —
+ * sets and reps live in the program and may have changed since.
+ *
+ * One line per session, expanded on demand. `<details>` carries the open state
+ * natively, so any number of sessions can stand open at once and the screen
+ * needs no state of its own; entering it renders fresh markup, which is why
+ * every session starts collapsed.
+ */
+export function renderJournal(sessions: JournalSession[]): string {
+  const cards = sessions
+    .map((session) => {
+      const lines = session.lines
+        .map(
+          (line) => `
+            <li class="session-line">
+              <span class="line-name">${escapeHtml(line.name)}</span>
+              <span class="line-weights">${escapeHtml(line.weights.join(' · '))} kg</span>
+            </li>`,
+        )
+        .join('')
+      // A session with no weights is still a session: the program was trained.
+      const body = lines
+        ? `<ul class="session-lines">${lines}</ul>`
+        : `<p class="session-empty">No weights recorded</p>`
+      return `
+        <details class="session">
+          <summary class="session-head">
+            <span class="session-date">${escapeHtml(formatSessionDate(session.date))}</span>
+            <span class="session-program">${escapeHtml(session.program)}</span>
+          </summary>
+          ${body}
+        </details>`
+    })
+    .join('')
+
+  return `
+    <header class="app-header">
+      <button class="back" data-action="back" aria-label="Back">‹</button>
+      <h1>History</h1>
+    </header>
+    <main class="journal">
+      ${cards || '<p class="session-empty">No workouts logged yet</p>'}
+    </main>`
 }
 
 function renderSetRow(exerciseId: string, weight: number | null, setIndex: number | null): string {

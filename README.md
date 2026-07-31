@@ -14,6 +14,15 @@ set** toggle that splits the row into one control per set.
 Every edit is saved immediately. **Finish** exists for the case where the
 workout happened but no weight changed — it records the session anyway.
 
+**History** in the top right of the program picker opens the log: one line per
+recorded session, newest first, with its date and program. Tapping a line
+unfolds the exercises and the weights logged for them — several can stand open
+at once, and the screen opens with everything folded. It is a read-only view of
+what was logged; sets and reps are not in it, because the log holds weights
+only (see
+[ADR-0009](docs/adr/0009-history-is-a-read-only-screen-derived-from-the-log.md)).
+The link appears once there is a session to read.
+
 Each exercise shows a thumbnail on the left; tapping it (marked with **?**)
 opens the technique guide with photos and a short step list. Exercises whose
 movement has no accurate photo in the source dataset show a letter placeholder

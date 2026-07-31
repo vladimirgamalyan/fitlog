@@ -90,6 +90,20 @@ input {
   color: var(--accent);
 }
 
+.header-action {
+  margin-left: auto;
+  flex: none;
+  padding: 12px;
+  margin-right: -12px;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .back {
   width: 44px;
   height: 44px;
@@ -206,11 +220,111 @@ input {
   color: var(--faint);
 }
 
-.workout {
+.workout,
+.journal {
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 16px 12px 32px;
+}
+
+.session {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+
+.session-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 15px 44px 15px 18px;
+  position: relative;
+  cursor: pointer;
+  /* Both are needed to drop the browser's own disclosure triangle. */
+  list-style: none;
+}
+
+.session-head::-webkit-details-marker {
+  display: none;
+}
+
+.session-head::after {
+  content: '›';
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-54%);
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--faint);
+  transition: transform 0.15s ease;
+}
+
+.session[open] .session-head::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.session-date {
+  flex: none;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.session-program {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.session-lines {
+  margin: 0;
+  padding: 4px 18px 16px;
+  list-style: none;
+}
+
+.session-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 15px;
+}
+
+.session-line + .session-line {
+  margin-top: 7px;
+}
+
+.line-name {
+  color: var(--muted);
+}
+
+.line-weights {
+  flex: none;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.session-empty {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--faint);
+}
+
+/* Inside a card it stands where the exercise list would. */
+.session .session-empty {
+  margin: 0;
+  padding: 4px 18px 16px;
 }
 
 .exercise {

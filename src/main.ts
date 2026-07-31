@@ -2,13 +2,14 @@ import { registerSW } from 'virtual:pwa-register'
 import '@fontsource-variable/space-grotesk'
 import './style.css'
 import { backupName, canShareFiles, downloadFile, programName, serialize, shareFile } from './backup'
+import { buildJournal } from './journal'
 import { parseProgramsFile } from './programImport'
 import programsData from './programs.json'
 import { loadImportedPrograms, saveImportedPrograms, takeSharedProgram } from './programStore'
 import { clearLog, loadLog, recordSession, saveLog, todayISO } from './storage'
 import type { Program, ProgramsFile, SessionEntry } from './types'
 import { collapseToSingle, expandToSets, isWeighted, resolveWeights } from './weights'
-import { type Draft, renderGuide, renderPicker, renderWorkout } from './view'
+import { type Draft, renderGuide, renderJournal, renderPicker, renderWorkout } from './view'
 
 /** Kilograms added or removed by one tap of the -/+ buttons. See ADR-0008. */
 const WEIGHT_STEP = 0.5
@@ -20,6 +21,7 @@ const app = document.querySelector<HTMLDivElement>('#app')!
 let log = loadLog()
 let activeProgram: Program | null = null
 let activeExerciseId: string | null = null
+let journalOpen = false
 let draft: Draft = new Map()
 /** Restored when returning from a guide, so the list does not jump to the top. */
 let workoutScrollY = 0
@@ -38,13 +40,18 @@ function currentPrograms(): ProgramsFile {
 
 function render(): void {
   const exercise = activeExercise()
-  if (activeProgram && exercise) app.innerHTML = renderGuide(exercise)
+  if (journalOpen) app.innerHTML = renderJournal(buildJournal(log, programs))
+  else if (activeProgram && exercise) app.innerHTML = renderGuide(exercise)
   else if (activeProgram) app.innerHTML = renderWorkout(activeProgram, draft)
   else app.innerHTML = renderPicker(programs, log, canShareFiles())
 }
 
-/** History entry describing a screen. null (the initial entry) is the picker. */
-type NavState = { programId: string; exerciseId?: string } | null
+/**
+ * History entry describing a screen. null (the initial entry) is the picker.
+ * The journal is a separate variant rather than another optional field, so
+ * entries pushed before it existed still describe a workout.
+ */
+type NavState = { programId: string; exerciseId?: string } | { journal: true } | null
 
 /**
  * Navigation lives in the browser history: entering a workout or a guide
@@ -54,6 +61,15 @@ type NavState = { programId: string; exerciseId?: string } | null
  * on a consistent screen.
  */
 function applyHistoryState(state: NavState): void {
+  if (state !== null && 'journal' in state) {
+    journalOpen = true
+    activeProgram = null
+    activeExerciseId = null
+    render()
+    window.scrollTo(0, 0)
+    return
+  }
+  journalOpen = false
   const program = state
     ? programs.find((candidate) => candidate.id === state.programId)
     : undefined
@@ -242,6 +258,9 @@ app.addEventListener('click', (event) => {
       if (program && programs.some((candidate) => candidate.id === program)) {
         navigate({ programId: program })
       }
+      break
+    case 'journal':
+      navigate({ journal: true })
       break
     case 'back':
       history.back()
