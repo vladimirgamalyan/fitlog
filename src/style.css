@@ -207,9 +207,28 @@ input {
 }
 
 .secondary.flash-error,
-.secondary.armed {
+.secondary.holding {
   border-color: rgba(224, 101, 92, 0.5);
   color: #e0655c;
+}
+
+/* Held down, not tapped: the button fills up over the five seconds the erase
+   takes, so the wait is visible. The fill is a background rather than an
+   overlay, so the label stays legible on top of it without extra markup.
+   Keep the 5s in step with CLEAR_HOLD_MS in main.ts. */
+.hold {
+  background-image: linear-gradient(rgba(224, 101, 92, 0.3), rgba(224, 101, 92, 0.3));
+  background-repeat: no-repeat;
+  background-size: 0 100%;
+  /* A long press must not start a text selection instead. */
+  -webkit-user-select: none;
+  user-select: none;
+  transition: transform 0.12s ease, border-color 0.15s ease, background-size 0.3s ease;
+}
+
+.hold.holding {
+  background-size: 100% 100%;
+  transition: transform 0.12s ease, border-color 0.15s ease, background-size 5s linear;
 }
 
 .backup-note {

@@ -52,7 +52,9 @@ function renderBackup(log: WorkoutLog, shareable: boolean): string {
     shareable ? `<button class="secondary" data-action="${action}">${label}</button>` : ''
   // Nothing to lose on an empty log, so the destructive button stays out of the way.
   const clear =
-    count === 0 ? '' : `<button class="secondary" data-action="clear-history">Clear history</button>`
+    count === 0
+      ? ''
+      : `<button class="secondary hold" data-action="clear-history">Clear history</button>`
   return `
     <footer class="backup">
       ${send('share-backup', 'Send history')}

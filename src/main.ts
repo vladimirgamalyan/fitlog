@@ -14,6 +14,9 @@ import { type Draft, renderGuide, renderJournal, renderPicker, renderWorkout } f
 /** Kilograms added or removed by one tap of the -/+ buttons. See ADR-0008. */
 const WEIGHT_STEP = 0.5
 
+/** How long "Clear history" is held before it erases. Matches .hold in style.css. */
+const CLEAR_HOLD_MS = 5000
+
 // The bundled file is a demo; an imported program replaces it at startup.
 let { programs } = programsData as ProgramsFile
 const app = document.querySelector<HTMLDivElement>('#app')!
@@ -184,20 +187,35 @@ async function importProgramsFromFile(file: File): Promise<void> {
   reportImport(error)
 }
 
+/** The "Clear history" button while it is held down, with its pending erase. */
+let clearHold: { button: HTMLElement; timer: number } | undefined
+
 /**
- * Wiping the history cannot be undone, so it takes two taps: the first arms the
- * button, the second erases. The armed state lives on the element rather than in
- * a variable, so any re-render disarms it; it also lapses on its own, so a
- * button left armed and forgotten does not erase the log on the next tap.
+ * Wiping the history cannot be undone, so the button has to be held down for
+ * CLEAR_HOLD_MS: no slip of a thumb lasts that long, and unlike a second tap
+ * the gesture cannot be finished by accident. The button fills up as it goes
+ * (CSS), so the wait is visible rather than blind.
  */
-function armClearHistory(button: HTMLElement): void {
-  const original = button.textContent ?? ''
-  button.classList.add('armed')
-  button.textContent = 'Tap again to clear'
-  window.setTimeout(() => {
-    button.classList.remove('armed')
-    button.textContent = original
-  }, 4000)
+function startClearHold(button: HTMLElement): void {
+  button.classList.add('holding')
+  const timer = window.setTimeout(() => {
+    clearHold = undefined
+    button.classList.remove('holding')
+    log = clearLog()
+    // The re-drawn footer says "No workouts logged yet": the confirmation is
+    // the picker itself, so no flash is needed.
+    render()
+  }, CLEAR_HOLD_MS)
+  clearHold = { button, timer }
+}
+
+/** Letting go early calls the erase off and says what the button wants. */
+function cancelClearHold(): void {
+  if (!clearHold) return
+  window.clearTimeout(clearHold.timer)
+  clearHold.button.classList.remove('holding')
+  flash(clearHold.button, 'Hold to clear')
+  clearHold = undefined
 }
 
 function pickProgramFile(): void {
@@ -299,18 +317,21 @@ app.addEventListener('click', (event) => {
     case 'load-program':
       pickProgramFile()
       break
-    case 'clear-history':
-      if (!trigger.classList.contains('armed')) {
-        armClearHistory(trigger)
-        break
-      }
-      log = clearLog()
-      // The re-drawn footer says "No workouts logged yet": the confirmation is
-      // the picker itself, so no flash is needed.
-      render()
-      break
+    // "clear-history" is deliberately absent: it is held, not clicked.
   }
 })
+
+app.addEventListener('pointerdown', (event) => {
+  const button = (event.target as HTMLElement).closest<HTMLElement>(
+    '[data-action="clear-history"]',
+  )
+  if (button) startClearHold(button)
+})
+
+// Listened for on the window: a pointer released off the button, or taken away
+// by a scroll, must call the erase off just the same.
+window.addEventListener('pointerup', cancelClearHold)
+window.addEventListener('pointercancel', cancelClearHold)
 
 app.addEventListener('change', (event) => {
   const input = event.target as HTMLInputElement
